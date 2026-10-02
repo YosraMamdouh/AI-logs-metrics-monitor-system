@@ -18,7 +18,8 @@ pipeline {
             steps {
                 dir('backend') {
                     sh '''
-                        docker run --rm -v $(pwd):/app -w /app python:3.11-slim sh -c "pip install --no-cache-dir -r requirements.txt && pytest tests/ || echo 'Tests completed'"
+                        # تم إزالة || echo للسماح للـ Pipeline باكتشاف الأخطاء الحقيقية
+                        docker run --rm -v $(pwd):/app -w /app python:3.11-slim sh -c "pip install --no-cache-dir -r requirements.txt && pytest tests/"
                     '''
                 }
             }
@@ -28,8 +29,8 @@ pipeline {
             steps {
                 dir('backend') {
                     script {
-                        docker.withRegistry('https://index.docker.io/v1/', "${DOCKER_CREDS_ID}") {
-                            def appImage = docker.build("${DOCKER_IMAGE}:${BUILD_NUMBER}")
+                        docker.withRegistry('https://index.docker.io/v1/', "${env.DOCKER_CREDS_ID}") {
+                            def appImage = docker.build("${env.DOCKER_IMAGE}:${env.BUILD_NUMBER}")
                             appImage.push()
                             appImage.push('latest')
                         }
