@@ -4,8 +4,7 @@ pipeline {
     environment {
         DOCKER_IMAGE = 'mariamas32/aiops-backend'
         DOCKER_CREDS_ID = 'docker-registry-creds'
-        K8S_NAMESPACE = 'aiops'
-    }
+        K8S_NAMESPACE = 'aiops'}
 
     stages {
         stage('Checkout Code') {
@@ -15,15 +14,18 @@ pipeline {
         }
 
         stage('Run Unit Tests') {
-            steps {
-                dir('backend') {
-                    sh '''
-                        docker run --rm -v $(pwd):/app -w /app python:3.11-slim sh -c "pip install --no-cache-dir -r requirements.txt && pytest tests/ || echo 'Tests completed'"
-                    '''
-                }
-            }
+    steps {
+        dir('backend') {
+            sh '''
+                docker run --rm \
+                    -v "$(pwd):/app" \
+                    -w /app \
+                    python:3.11-slim-bookworm \
+                    sh -c "pip install --no-cache-dir -r requirements.txt && pytest tests/ -v"
+            '''
         }
-
+    }
+}
         stage('Build & Push Docker Image') {
             steps {
                 dir('backend') {

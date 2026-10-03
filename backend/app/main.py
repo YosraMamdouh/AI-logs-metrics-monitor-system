@@ -40,8 +40,6 @@ instrumentator = Instrumentator(
     should_group_status_codes=False,
     should_ignore_untemplated=True,
     should_respect_env_var=False,
-    metric_namespace="aiops",
-    metric_subsystem="backend",
 )
 instrumentator.instrument(app).expose(app, endpoint=settings.PROMETHEUS_METRICS_PATH)
 
