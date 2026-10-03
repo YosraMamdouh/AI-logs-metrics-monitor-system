@@ -9,7 +9,7 @@ pipeline {
     stages {
         stage('Checkout Code') {
             steps {
-                git branch: 'main', url: 'https://github.com/zeyadmvtr/AI-logs-metrics-monitor-system.git'
+                git branch: 'main', url: 'https://github.com/YosraMamdouh/AI-logs-metrics-monitor-system.git'
             }
         }
 
