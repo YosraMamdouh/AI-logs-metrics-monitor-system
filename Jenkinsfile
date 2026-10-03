@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = 'mariamas32/aiops-backend'
-        DOCKER_CREDS_ID = 'Jenkins_cred'
+        DOCKER_IMAGE = 'yosramamdouh234/aiops-backend'
+        DOCKER_CREDS_ID = 'jenkins-token'
         K8S_NAMESPACE = 'aiops'
     }
 
