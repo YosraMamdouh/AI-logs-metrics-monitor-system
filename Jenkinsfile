@@ -3,7 +3,7 @@ pipeline {
     environment {
         DOCKER_IMAGE = 'yosramamdouh234/aiops-backend'
         DOCKER_CREDS_ID = 'jenkins-token'
-        K8S_NAMESPACE = 'aiops'
+        K8S_NAMESPACE = 'dev'
     }
     stages {
         stage('Checkout Code') {
@@ -45,12 +45,8 @@ pipeline {
                         echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
                         docker tag aiops-backend:${BUILD_NUMBER} ${DOCKER_IMAGE}:${BUILD_NUMBER}
                         docker tag aiops-backend:${BUILD_NUMBER} ${DOCKER_IMAGE}:latest
-                        for i in 1 2 3 4 5; do
-                            docker push ${DOCKER_IMAGE}:${BUILD_NUMBER} && break || (echo "Push timed out, retrying in 3s..." && sleep 3)
-                        done
-                        for i in 1 2 3 4 5; do
-                            docker push ${DOCKER_IMAGE}:latest && break || (echo "Push timed out, retrying in 3s..." && sleep 3)
-                        done
+                        docker push ${DOCKER_IMAGE}:${BUILD_NUMBER}
+                        docker push ${DOCKER_IMAGE}:latest
                         docker logout
                     '''
                 }
@@ -59,13 +55,9 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 sh '''
-                    kubectl create namespace ${K8S_NAMESPACE} \
-                        --dry-run=client \
-                        -o yaml | kubectl apply -f -
                     sed -i "s|image: .*|image: ${DOCKER_IMAGE}:${BUILD_NUMBER}|g" \
                         K8s_YAML/05-backend-deployment.yaml
-                    kubectl apply -f K8s_YAML/ \
-                        -n ${K8S_NAMESPACE}
+                    kubectl apply -f K8s_YAML/
                 '''
             }
         }
