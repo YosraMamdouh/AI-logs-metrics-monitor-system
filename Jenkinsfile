@@ -34,7 +34,7 @@ pipeline {
                     sh '''
                         docker run --rm \
                             aiops-backend:${BUILD_NUMBER} \
-                            python -m pytest tests/ -v
+                            python -m pytest tests/ -v -p no:cacheprovider
                     '''
                 }
             }
@@ -42,29 +42,22 @@ pipeline {
 
         stage('Push Docker Image') {
             steps {
-                script {
-                    docker.withRegistry(
-                        'https://index.docker.io/v1/',
-                        "${DOCKER_CREDS_ID}"
-                    ) {
+                withCredentials([usernamePassword(
+                    credentialsId: env.DOCKER_CREDS_ID,
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+                    sh '''
+                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
 
-                        sh """
-                            docker tag \
-                                aiops-backend:${BUILD_NUMBER} \
-                                ${DOCKER_IMAGE}:${BUILD_NUMBER}
+                        docker tag aiops-backend:${BUILD_NUMBER} ${DOCKER_IMAGE}:${BUILD_NUMBER}
+                        docker tag aiops-backend:${BUILD_NUMBER} ${DOCKER_IMAGE}:latest
 
-                            docker tag \
-                                aiops-backend:${BUILD_NUMBER} \
-                                ${DOCKER_IMAGE}:latest
-                        """
+                        docker push ${DOCKER_IMAGE}:${BUILD_NUMBER}
+                        docker push ${DOCKER_IMAGE}:latest
 
-                        def appImage = docker.image(
-                            "${DOCKER_IMAGE}:${BUILD_NUMBER}"
-                        )
-
-                        appImage.push()
-                        appImage.push('latest')
-                    }
+                        docker logout
+                    '''
                 }
             }
         }
