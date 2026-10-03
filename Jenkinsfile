@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DOCKER_IMAGE = 'mariamas32/aiops-backend'
-        DOCKER_CREDS_ID = 'docker-registry-creds'
+        DOCKER_CREDS_ID = 'Jenkins_cred'
         K8S_NAMESPACE = 'aiops'
     }
 
