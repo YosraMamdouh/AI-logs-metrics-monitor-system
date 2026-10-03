@@ -17,16 +17,26 @@ pipeline {
     steps {
         dir('backend') {
             sh '''
+                echo "=== WORKSPACE ==="
+                pwd
+
+                echo "=== FILES ==="
+                ls -la
+
+                echo "=== REQUIREMENTS ==="
+                ls -l requirements.txt
+
+                echo "=== DOCKER ==="
                 docker run --rm \
                     -v "$(pwd):/app" \
                     -w /app \
                     python:3.11-slim-bookworm \
-                    sh -c "pip install --no-cache-dir -r requirements.txt && pytest tests/ -v"
+                    sh -c "ls -la /app && pip install --no-cache-dir -r requirements.txt && pytest tests/ -v"
             '''
         }
     }
 }
-        stage('Build & Push Docker Image') {
+                    stage('Build & Push Docker Image') {
             steps {
                 dir('backend') {
                     script {
