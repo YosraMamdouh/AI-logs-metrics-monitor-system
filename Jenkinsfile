@@ -67,7 +67,7 @@ pipeline {
                     kubectl rollout status \
                         deployment/aiops-backend \
                         -n ${K8S_NAMESPACE} \
-                        --timeout=60s
+                        --timeout=180s
                 '''
             }
         }
