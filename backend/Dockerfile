@@ -21,7 +21,7 @@ COPY requirements.txt .
 # Install Python dependencies
 RUN pip install --no-cache-dir --user -r requirements.txt
 
-
+COPY --chown=appuser:appgroup tests /app/tests
 # ==========================================
 # Stage 2: Minimal Production Runtime
 # ==========================================
