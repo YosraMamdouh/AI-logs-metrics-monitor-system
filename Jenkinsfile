@@ -8,6 +8,7 @@ pipeline {
         DOCKER_IMAGE = 'yosramamdouh234/aiops-backend'
         DOCKER_CREDS_ID = 'jenkins-token'
         K8S_NAMESPACE = 'dev'
+        NOTIFICATION_EMAIL = 'yousramamdouh1405@gmail.com'
     }
     stages {
         stage('Checkout Code') {
@@ -77,6 +78,28 @@ pipeline {
         }
     }
     post {
+        success {
+            mail to: "${env.NOTIFICATION_EMAIL}",
+                 subject: "✅ SUCCESS: Build #${BUILD_NUMBER} - ${currentBuild.fullDisplayName}",
+                 body: """
+تهانينا! اكتمل الـ Pipeline بنجاح 🟢
+- المشروع: ${env.JOB_NAME}
+- رقم الـ Build: #${BUILD_NUMBER}
+- الحالة: تم فحص الكود، الرفع إلى Docker Hub، والنشر بنجاح على Kubernetes!
+- رابط التفاصيل: ${env.BUILD_URL}
+"""
+        }
+        failure {
+            mail to: "${env.NOTIFICATION_EMAIL}",
+                 subject: "❌ FAILED: Build #${BUILD_NUMBER} - ${currentBuild.fullDisplayName}",
+                 body: """
+تحذير: فشل الـ Pipeline 🔴
+- المشروع: ${env.JOB_NAME}
+- رقم الـ Build: #${BUILD_NUMBER}
+- يرجى مراجعة سجلات Jenkins عبر الرابط لمعرفة سبب الخطأ:
+${env.BUILD_URL}console
+"""
+        }
         always {
             cleanWs()
         }
