@@ -1,5 +1,9 @@
 pipeline {
     agent any
+    triggers {
+        // فحص GitHub تلقائياً كل دقيقة لبدء البناء بمجرد عمل push
+        pollSCM('* * * * *')
+    }
     environment {
         DOCKER_IMAGE = 'yosramamdouh234/aiops-backend'
         DOCKER_CREDS_ID = 'jenkins-token'
